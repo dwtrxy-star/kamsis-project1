@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Cryptography Tool</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔐 INI BLOKCHIPER SAYANG</h1>
+<p>Caesar • Vigenere • Rail Fence</p>
+
+<label>Masukkan Text</label>
+<textarea id="text"></textarea>
+
+<label>Key</label>
+<input type="text" id="key">
+
+<label>Pilih Metode</label>
+<select id="method">
+<option value="caesar">Caesar Cipher</option>
+<option value="vigenere">Vigenere Cipher</option>
+<option value="rail">Rail Fence Cipher</option>
+</select>
+
+<div class="buttons">
+<button onclick="encrypt()">Encrypt</button>
+<button onclick="decrypt()">Decrypt</button>
+</div>
+
+<label>Hasil Cipher</label>
+<textarea id="result"></textarea>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
