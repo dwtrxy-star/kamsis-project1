@@ -1,60 +1,42 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Aplikasi Penyandian Data</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="container">
-    <h1>Aplikasi Penyandian Data</h1>
+<div class="container">
+  <h1>Aplikasi Penyandian Data</h1>
 
-    <label for="mode">Mode Operasi</label>
-    <select id="mode">
-      <option value="ECB">ECB</option>
-      <option value="CBC">CBC</option>
-      <option value="CFB">CFB</option>
-    </select>
+  <label>Mode Operasi</label>
+  <select id="mode">
+    <option value="ECB">ECB</option>
+    <option value="CBC">CBC</option>
+    <option value="CFB">CFB</option>
+  </select>
 
-    <label for="key">Kunci</label>
-    <input
-      type="text"
-      id="key"
-      placeholder="Masukkan kunci minimal 8 karakter"
-    />
+  <label>Kunci</label>
+  <input type="text" id="key" placeholder="Masukkan kunci bebas">
 
-    <div id="ivWrap">
-      <label for="iv">IV (untuk CBC & CFB)</label>
-      <input
-        type="text"
-        id="iv"
-        placeholder="Masukkan IV minimal 8 karakter"
-      />
-      <small id="ivInfo">Mode ECB tidak memakai IV.</small>
-    </div>
+  <label>IV (untuk CBC & CFB)</label>
+  <input type="text" id="iv" placeholder="Masukkan IV bebas">
 
-    <label for="inputText">Input</label>
-    <textarea
-      id="inputText"
-      placeholder="Masukkan teks biasa untuk enkripsi atau Base64 untuk dekripsi"
-    ></textarea>
+  <label>Input</label>
+  <textarea id="inputText" placeholder="Masukkan teks..."></textarea>
 
-    <div class="row">
-      <button class="encrypt" id="btnEncrypt" type="button">Enkripsi</button>
-      <button class="decrypt" id="btnDecrypt" type="button">Dekripsi</button>
-    </div>
-
-    <label for="outputText">Output</label>
-    <textarea
-      id="outputText"
-      readonly
-      placeholder="Hasil akan muncul di sini"
-    ></textarea>
-
-    <div class="info" id="info">Siap digunakan.</div>
+  <div class="row">
+    <button id="btnEncrypt">Enkripsi</button>
+    <button id="btnDecrypt">Dekripsi</button>
   </div>
 
-  <script src="app.js"></script>
+  <label>Output</label>
+  <textarea id="outputText" readonly></textarea>
+
+  <div class="info" id="info"></div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
