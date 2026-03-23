@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -58,50 +57,4 @@
 
   <script src="app.js"></script>
 </body>
-=======
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplikasi Penyandian Data</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Aplikasi Penyandian Data</h1>
-
-    <label for="mode">Mode Operasi</label>
-    <select id="mode">
-      <option value="ECB">ECB</option>
-      <option value="CBC">CBC</option>
-      <option value="CFB">CFB</option>
-    </select>
-
-    <label for="key">Kunci</label>
-    <input type="text" id="key" value="12345678" placeholder="Minimal 8 karakter" />
-
-    <div id="ivWrap">
-      <label for="iv">IV (untuk CBC & CFB)</label>
-      <input type="text" id="iv" value="abcdefgh" placeholder="Minimal 8 karakter" />
-      <small id="ivInfo">Mode ECB tidak memakai IV.</small>
-    </div>
-
-    <label for="inputText">Input</label>
-    <textarea id="inputText" placeholder="Masukkan teks biasa untuk enkripsi atau Base64 untuk dekripsi">IlmaJulianti</textarea>
-
-    <div class="row">
-      <button class="encrypt" id="btnEncrypt">Enkripsi</button>
-      <button class="decrypt" id="btnDecrypt">Dekripsi</button>
-    </div>
-
-    <label for="outputText">Output</label>
-    <textarea id="outputText" readonly placeholder="Hasil akan muncul di sini"></textarea>
-
-    <div class="info" id="info">Siap digunakan.</div>
-  </div>
-
-  <script src="app.js"></script>
-</body>
->>>>>>> 949afa3d3312ab574b5eab3dd8bb486f7d33f70a
 </html>
