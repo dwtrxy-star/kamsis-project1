@@ -1,42 +1,60 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Cryptography Tool</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Penyandian Data</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <div class="container">
+    <h1>Aplikasi Penyandian Data</h1>
 
-<div class="container">
+    <label for="mode">Mode Operasi</label>
+    <select id="mode">
+      <option value="ECB">ECB</option>
+      <option value="CBC">CBC</option>
+      <option value="CFB">CFB</option>
+    </select>
 
-<h1>🔐 INI BLOKCHIPER SAYANG</h1>
-<p>Caesar • Vigenere • Rail Fence</p>
+    <label for="key">Kunci</label>
+    <input
+      type="text"
+      id="key"
+      placeholder="Masukkan kunci minimal 8 karakter"
+    />
 
-<label>Masukkan Text</label>
-<textarea id="text"></textarea>
+    <div id="ivWrap">
+      <label for="iv">IV (untuk CBC & CFB)</label>
+      <input
+        type="text"
+        id="iv"
+        placeholder="Masukkan IV minimal 8 karakter"
+      />
+      <small id="ivInfo">Mode ECB tidak memakai IV.</small>
+    </div>
 
-<label>Key</label>
-<input type="text" id="key">
+    <label for="inputText">Input</label>
+    <textarea
+      id="inputText"
+      placeholder="Masukkan teks biasa untuk enkripsi atau Base64 untuk dekripsi"
+    ></textarea>
 
-<label>Pilih Metode</label>
-<select id="method">
-<option value="caesar">Caesar Cipher</option>
-<option value="vigenere">Vigenere Cipher</option>
-<option value="rail">Rail Fence Cipher</option>
-</select>
+    <div class="row">
+      <button class="encrypt" id="btnEncrypt" type="button">Enkripsi</button>
+      <button class="decrypt" id="btnDecrypt" type="button">Dekripsi</button>
+    </div>
 
-<div class="buttons">
-<button onclick="encrypt()">Encrypt</button>
-<button onclick="decrypt()">Decrypt</button>
-</div>
+    <label for="outputText">Output</label>
+    <textarea
+      id="outputText"
+      readonly
+      placeholder="Hasil akan muncul di sini"
+    ></textarea>
 
-<label>Hasil Cipher</label>
-<textarea id="result"></textarea>
+    <div class="info" id="info">Siap digunakan.</div>
+  </div>
 
-</div>
-
-<script src="script.js"></script>
-
+  <script src="app.js"></script>
 </body>
 </html>
