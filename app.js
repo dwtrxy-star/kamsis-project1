@@ -1,138 +1,242 @@
 const BLOCK_SIZE = 8;
 
 // ================= BASIC =================
-function textToBytes(t){
-  return Array.from(new TextEncoder().encode(t));
+function textToBytes(text) {
+  return Array.from(new TextEncoder().encode(text));
 }
 
-function bytesToText(b){
-  return new TextDecoder().decode(new Uint8Array(b));
+function bytesToText(bytes) {
+  return new TextDecoder().decode(new Uint8Array(bytes));
 }
 
-function xor(a,b){
-  return a.map((v,i)=>v ^ b[i % b.length]);
+function xor(a, b) {
+  if (b.length === 0) {
+    b = [0];
+  }
+  return a.map((v, i) => v ^ b[i % b.length]);
 }
 
 // ================= BASE64 =================
-function bytesToBase64(bytes){
-  let binary="";
-  bytes.forEach(b=>binary+=String.fromCharCode(b));
+function bytesToBase64(bytes) {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
   return btoa(binary);
 }
 
-function base64ToBytes(base64){
-  let binary=atob(base64.trim());
-  return Array.from(binary).map(c=>c.charCodeAt(0));
+function base64ToBytes(base64) {
+  const clean = base64.trim();
+  const binary = atob(clean);
+  const bytes = [];
+  for (let i = 0; i < binary.length; i++) {
+    bytes.push(binary.charCodeAt(i));
+  }
+  return bytes;
 }
 
-// ================= LOGIC =================
-function sub(b){
-  return b.map(x=>(x*7+3)%256);
+// ================= SUBSTITUSI =================
+function sub(bytes) {
+  return bytes.map((x) => (x * 7 + 3) % 256);
 }
 
-function invSub(b){
-  return b.map(x=>((x-3+256)*183)%256);
+function invSub(bytes) {
+  return bytes.map((x) => (((x - 3 + 256) % 256) * 183) % 256);
 }
 
-function perm(b){
-  return [...b].reverse();
+// ================= PERMUTASI =================
+function perm(bytes) {
+  return [...bytes].reverse();
 }
 
 // ================= BLOCK =================
-function encryptBlock(b,k){
-  return perm(sub(xor(b,k)));
+function encryptBlock(block, key) {
+  return perm(sub(xor(block, key)));
 }
 
-function decryptBlock(b,k){
-  return xor(invSub(perm(b)),k);
+function decryptBlock(block, key) {
+  return xor(invSub(perm(block)), key);
+}
+
+// ================= PADDING =================
+function padZero(data) {
+  const out = [...data];
+  while (out.length % BLOCK_SIZE !== 0) {
+    out.push(0);
+  }
+  return out;
+}
+
+function removeTrailingZeros(text) {
+  return text.replace(/\0+$/g, "");
+}
+
+// ================= NORMALIZE =================
+function normalizeToBlock(bytes) {
+  const out = [...bytes];
+  if (out.length === 0) {
+    out.push(0);
+  }
+  while (out.length < BLOCK_SIZE) {
+    out.push(0);
+  }
+  return out.slice(0, BLOCK_SIZE);
 }
 
 // ================= MODE =================
-function ECB(d,k,e){
-  let r=[];
-  for(let i=0;i<d.length;i+=BLOCK_SIZE){
-    let b=d.slice(i,i+BLOCK_SIZE);
-    r.push(...(e?encryptBlock(b,k):decryptBlock(b,k)));
+function ECB(data, key, encryptMode) {
+  const result = [];
+
+  for (let i = 0; i < data.length; i += BLOCK_SIZE) {
+    const block = data.slice(i, i + BLOCK_SIZE);
+    const out = encryptMode
+      ? encryptBlock(block, key)
+      : decryptBlock(block, key);
+    result.push(...out);
   }
-  return r;
+
+  return result;
 }
 
-function CBC(d,k,iv,e){
-  let r=[],prev=iv;
-  for(let i=0;i<d.length;i+=BLOCK_SIZE){
-    let b=d.slice(i,i+BLOCK_SIZE);
-    if(e){
-      let c=encryptBlock(xor(b,prev),k);
-      r.push(...c);
-      prev=c;
-    }else{
-      let p=xor(decryptBlock(b,k),prev);
-      r.push(...p);
-      prev=b;
+function CBC(data, key, iv, encryptMode) {
+  const result = [];
+  let prev = [...iv];
+
+  for (let i = 0; i < data.length; i += BLOCK_SIZE) {
+    const block = data.slice(i, i + BLOCK_SIZE);
+
+    if (encryptMode) {
+      const mixed = xor(block, prev);
+      const cipher = encryptBlock(mixed, key);
+      result.push(...cipher);
+      prev = cipher;
+    } else {
+      const plainTemp = decryptBlock(block, key);
+      const plain = xor(plainTemp, prev);
+      result.push(...plain);
+      prev = block;
     }
   }
-  return r;
+
+  return result;
 }
 
-function CFB(d,k,iv,e){
-  let r=[],prev=iv;
-  for(let i=0;i<d.length;i+=BLOCK_SIZE){
-    let b=d.slice(i,i+BLOCK_SIZE);
-    let o=xor(b,encryptBlock(prev,k));
-    r.push(...o);
-    prev=e?o:b;
+function CFB(data, key, iv, encryptMode) {
+  const result = [];
+  let prev = [...iv];
+
+  for (let i = 0; i < data.length; i += BLOCK_SIZE) {
+    const block = data.slice(i, i + BLOCK_SIZE);
+    const stream = encryptBlock(prev, key);
+    const out = xor(block, stream);
+
+    result.push(...out);
+    prev = encryptMode ? out : block;
   }
-  return r;
+
+  return result;
+}
+
+// ================= UTIL =================
+function getMode() {
+  return document.getElementById("mode").value;
+}
+
+function getKey() {
+  const keyText = document.getElementById("key").value;
+  return normalizeToBlock(textToBytes(keyText));
+}
+
+function getIV(mode) {
+  if (mode === "ECB") {
+    return new Array(BLOCK_SIZE).fill(0);
+  }
+
+  const ivText = document.getElementById("iv").value;
+  return normalizeToBlock(textToBytes(ivText));
 }
 
 // ================= MAIN =================
-function run(type){
-  try{
-    let mode=document.getElementById("mode").value;
-    let key=textToBytes(document.getElementById("key").value || "key");
-    let iv=textToBytes(document.getElementById("iv").value || "iv");
-    let input=document.getElementById("inputText").value;
+function run(type) {
+  try {
+    const mode = getMode();
+    const key = getKey();
+    const iv = getIV(mode);
+    const input = document.getElementById("inputText").value;
 
-    if(!input){
-      alert("Input kosong!");
-      return;
+    if (!input.trim()) {
+      throw new Error("Input tidak boleh kosong.");
     }
 
     let data;
     let out;
 
-    if(type==="encrypt"){
-      data=textToBytes(input);
+    if (type === "encrypt") {
+      data = textToBytes(input);
+      data = padZero(data);
 
-      while(data.length % BLOCK_SIZE !== 0){
-        data.push(0);
+      if (mode === "ECB") {
+        out = ECB(data, key, true);
+      } else if (mode === "CBC") {
+        out = CBC(data, key, iv, true);
+      } else {
+        out = CFB(data, key, iv, true);
       }
 
-      if(mode==="ECB") out=ECB(data,key,true);
-      else if(mode==="CBC") out=CBC(data,key,iv,true);
-      else out=CFB(data,key,iv,true);
+      document.getElementById("outputText").value = bytesToBase64(out);
+      document.getElementById("info").innerText = "Berhasil enkripsi";
+    } else {
+      data = base64ToBytes(input);
 
-      document.getElementById("outputText").value=bytesToBase64(out);
-      document.getElementById("info").innerText="Berhasil enkripsi";
+      if (mode === "ECB") {
+        out = ECB(data, key, false);
+      } else if (mode === "CBC") {
+        out = CBC(data, key, iv, false);
+      } else {
+        out = CFB(data, key, iv, false);
+      }
 
-    }else{
-      data=base64ToBytes(input);
-
-      if(mode==="ECB") out=ECB(data,key,false);
-      else if(mode==="CBC") out=CBC(data,key,iv,false);
-      else out=CFB(data,key,iv,false);
-
-      document.getElementById("outputText").value=bytesToText(out).replace(/\0+$/g,"");
-      document.getElementById("info").innerText="Berhasil dekripsi";
+      const plainText = removeTrailingZeros(bytesToText(out));
+      document.getElementById("outputText").value = plainText;
+      document.getElementById("info").innerText = "Berhasil dekripsi";
     }
-
-  }catch(e){
-    document.getElementById("info").innerText="Error: "+e.message;
+  } catch (e) {
+    document.getElementById("outputText").value = "";
+    document.getElementById("info").innerText = "Error: " + e.message;
   }
 }
 
-// ================= FIX BUTTON =================
-document.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("btnEncrypt").onclick=()=>run("encrypt");
-  document.getElementById("btnDecrypt").onclick=()=>run("decrypt");
+// ================= UI =================
+function updateIVState() {
+  const mode = getMode();
+  const ivInput = document.getElementById("iv");
+  const ivWrap = document.getElementById("ivWrap");
+  const ivInfo = document.getElementById("ivInfo");
+
+  if (mode === "ECB") {
+    ivInput.disabled = true;
+    ivWrap.classList.add("disabled");
+    ivInfo.textContent = "Catatan: IV tidak wajib untuk mode ECB, tetapi digunakan pada mode CBC dan CFB.";
+  } else {
+    ivInput.disabled = false;
+    ivWrap.classList.remove("disabled");
+    ivInfo.textContent = "Catatan: IV digunakan pada mode CBC dan CFB.";
+  }
+}
+
+// ================= EVENT =================
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .getElementById("btnEncrypt")
+    .addEventListener("click", () => run("encrypt"));
+
+  document
+    .getElementById("btnDecrypt")
+    .addEventListener("click", () => run("decrypt"));
+
+  document
+    .getElementById("mode")
+    .addEventListener("change", updateIVState);
+
+  updateIVState();
 });

@@ -1,59 +1,60 @@
-body {
-  font-family: Arial;
-  background: linear-gradient(135deg,#1e3c72,#2a5298);
-  color: white;
-  padding: 20px;
-}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Penyandian Data</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Aplikasi Penyandian Data</h1>
 
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-  border-radius: 20px;
-  background: #111827;
-}
+    <label for="mode">Mode Operasi</label>
+    <select id="mode">
+      <option value="ECB">ECB</option>
+      <option value="CBC">CBC</option>
+      <option value="CFB">CFB</option>
+    </select>
 
-h1 {
-  text-align: center;
-}
+    <label for="key">Kunci</label>
+    <input
+      type="text"
+      id="key"
+      placeholder="Masukkan kunci bebas"
+    />
 
-input, select, textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 10px;
-  border: none;
-  background: #1c1c2b;
-  color: white;
-}
+    <div id="ivWrap">
+      <label for="iv">IV</label>
+      <input
+        type="text"
+        id="iv"
+        placeholder="Masukkan IV bebas"
+      />
+      <small id="ivInfo">Catatan: IV tidak wajib untuk mode ECB, tetapi digunakan pada mode CBC dan CFB.</small>
+    </div>
 
-textarea {
-  height: 120px;
-}
+    <label for="inputText">Input</label>
+    <textarea
+      id="inputText"
+      placeholder="Masukkan teks biasa untuk enkripsi atau Base64 untuk dekripsi"
+    ></textarea>
 
-button {
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
+    <div class="row">
+      <button class="encrypt" id="btnEncrypt" type="button">Enkripsi</button>
+      <button class="decrypt" id="btnDecrypt" type="button">Dekripsi</button>
+    </div>
 
-#btnEncrypt {
-  background: linear-gradient(135deg,#00c6ff,#0072ff);
-}
+    <label for="outputText">Output</label>
+    <textarea
+      id="outputText"
+      readonly
+      placeholder="Hasil akan muncul di sini"
+    ></textarea>
 
-#btnDecrypt {
-  background: linear-gradient(135deg,#ff512f,#dd2476);
-}
+    <div class="info" id="info"></div>
+  </div>
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.info {
-  margin-top: 10px;
-  color: yellow;
-}
+  <script src="app.js"></script>
+</body>
+</html>
